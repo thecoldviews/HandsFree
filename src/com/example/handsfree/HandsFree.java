@@ -3,8 +3,11 @@ package com.example.handsfree;
 import java.util.ArrayList;
 
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.app.KeyguardManager.KeyguardLock;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -141,6 +144,12 @@ public class HandsFree extends Activity {
 	 */
 	private void startVoiceRecognitionActivity()	
     {
+		 PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+         WakeLock wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+         wakeLock.acquire();
+         KeyguardManager keyguardManager = (KeyguardManager) getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE); 
+         KeyguardLock keyguardLock =  keyguardManager.newKeyguardLock("TAG");
+         keyguardLock.disableKeyguard();
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
