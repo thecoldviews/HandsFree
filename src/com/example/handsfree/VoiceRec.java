@@ -17,7 +17,8 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
-public class DictateAndSend extends Activity{
+public class VoiceRec extends Activity{
+	// Called from onCreate
     private static WakeLock fullWakeLock;
     private static WakeLock partialWakeLock; 
 	protected void createWakeLocks(){
@@ -51,34 +52,20 @@ public class DictateAndSend extends Activity{
 	    keyguardLock.disableKeyguard();
 	}
 	
-	
 	private static final int REQUEST_CODE = 1234;
-	private BroadcastReceiver check;
-	IntentFilter filtercheck= new IntentFilter("android.intent.action.check");
 	
 	protected void onCreate(Bundle savedInstanceState){
-		createWakeLocks();
-		wakeDevice();
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.dictate);
-		 check = new BroadcastReceiver() {
-		   	 @Override
-		   	 public void onReceive(Context context, Intent intent) {
-		           Toast.makeText(getApplicationContext(),"check", Toast.LENGTH_SHORT).show();
-		           startVoiceRecognitionActivity();
-		   	 }
-		   };
-		   	//registering our receiver
-		 this.registerReceiver(this.check,filtercheck);
-		
-		Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
-		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Please Dictate your Message").putExtra("type", "sms"));	
+		startVoiceRecognitionActivity();
+		createWakeLocks();
+		wakeDevice();
+//		Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
+//		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Please Dictate your Message"));	
 	}
 	
     protected void onDestroy() {
-    	unregisterReceiver(check);
     	super.onDestroy();
-        
     }
 	
 	protected void sendSMSMessage(String phoneNo, String message) {
@@ -105,8 +92,8 @@ public class DictateAndSend extends Activity{
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please Dictate Your Message!");
-        //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Reply Back?");
+        //Toast.makeText(getApplicationContext(), "You are supposed to talk now", Toast.LENGTH_SHORT).show();
         startActivityForResult(intent, REQUEST_CODE);
     }
  
@@ -121,10 +108,21 @@ public class DictateAndSend extends Activity{
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-           // Toast.makeText(getApplicationContext(), matches.get(0), Toast.LENGTH_SHORT).show();
-            	//Toast.makeText(getApplicationContext(),"Sending SMS to "+MyApp.number, Toast.LENGTH_SHORT).show();
-            	sendSMSMessage(MyApp.number,matches.get(0).toLowerCase());
+            Toast.makeText(getApplicationContext(), matches.get(0), Toast.LENGTH_SHORT).show();
+            if(matches.get(0).toLowerCase().compareTo("yes")==0){
+            	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            	Toast.makeText(getApplicationContext(),"Sending SMS to "+MyApp.number, Toast.LENGTH_SHORT).show();
+            	String userValue = prefs.getString("listPref", "1");
+            	//Toast.makeText(getApplicationContext(),userValue, Toast.LENGTH_SHORT).show();
+            	if (userValue.equals("1") ){
+            		sendSMSMessage(MyApp.number,prefs.getString("text", "default"));
+            	}
+            	else if (userValue.equals("2") ){
+            		startActivity(new Intent(this,DictateAndSend.class).putExtra("number",MyApp.number));    
+            	}
+            }else{
             	
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
         finish();

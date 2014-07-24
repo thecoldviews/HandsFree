@@ -27,7 +27,7 @@ public class NotiListener extends NotificationListenerService {
         Log.i(TAG,"********** onNotificationPosted");
         Log.i(TAG,"ID :" + sbn.getId() + "\t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
         Intent i = new Intent("com.example.handsfree.newnoti");
-        i.putExtra("notification_event",sbn.getPackageName() + "\n");
+        i.putExtra("notification_event",(sbn.getPackageName().split("."))[(sbn.getPackageName().split(".")).length -1]+" "+sbn.getNotification().tickerText + "\n");
         sendBroadcast(i);
     }
 

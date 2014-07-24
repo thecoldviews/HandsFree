@@ -14,6 +14,7 @@ public class ReadOut extends Service implements TextToSpeech.OnInitListener{
 	
 	public final String tag="yo";
 	private String str;
+	private String type;
 	private TextToSpeech mTts;
 	private static final String TAG="TTSService";
 	public static int a=1;
@@ -32,6 +33,7 @@ public class ReadOut extends Service implements TextToSpeech.OnInitListener{
 		//Toast.makeText(getApplicationContext(),"onStartCommand", Toast.LENGTH_LONG).show();
 	    mTts.setSpeechRate(1.0f);
 	    str=intent.getStringExtra("noti");
+	    type=intent.getStringExtra("type");
 	    Toast.makeText(getApplicationContext(),str, Toast.LENGTH_LONG).show();
 	    return Service.START_NOT_STICKY;
 	}
@@ -62,13 +64,19 @@ public class ReadOut extends Service implements TextToSpeech.OnInitListener{
 	                sayHello(str);
 	                try{
 	                	//Toast.makeText(getApplicationContext(), "Delay dena hai 6 sec ka", Toast.LENGTH_LONG).show();
-	                	Thread.sleep(str.length()*90);
+	                	Thread.sleep(str.length()*180);
 	                }
 	                catch(InterruptedException e){
 	                	e.printStackTrace();
 	                }
 	                Toast.makeText(getApplicationContext(), "Intent Sent", Toast.LENGTH_LONG).show();
-	                Intent i = new Intent("android.intent.action.check");
+	                Intent i;
+	                if(type.compareTo("sms")==0){
+	                	 i= new Intent("android.intent.action.check");
+	                }
+	                else{
+	                	i = new Intent("android.intent.action.callcheck");
+	                }
 	                this.sendBroadcast(i);
 	                this.stopSelf();
 	            }

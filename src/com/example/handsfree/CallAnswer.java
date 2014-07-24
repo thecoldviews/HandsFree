@@ -15,9 +15,11 @@ import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
-public class DictateAndSend extends Activity{
+public class CallAnswer extends Activity{
+	// Called from onCreate
     private static WakeLock fullWakeLock;
     private static WakeLock partialWakeLock; 
 	protected void createWakeLocks(){
@@ -51,17 +53,17 @@ public class DictateAndSend extends Activity{
 	    keyguardLock.disableKeyguard();
 	}
 	
-	
 	private static final int REQUEST_CODE = 1234;
-	private BroadcastReceiver check;
-	IntentFilter filtercheck= new IntentFilter("android.intent.action.check");
+	private BroadcastReceiver callcheck;
+	IntentFilter filtercheck= new IntentFilter("android.intent.action.callcheck");
 	
 	protected void onCreate(Bundle savedInstanceState){
-		createWakeLocks();
-		wakeDevice();
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.dictate);
-		 check = new BroadcastReceiver() {
+		createWakeLocks();
+		wakeDevice();
+		
+		 callcheck = new BroadcastReceiver() {
 		   	 @Override
 		   	 public void onReceive(Context context, Intent intent) {
 		           Toast.makeText(getApplicationContext(),"check", Toast.LENGTH_SHORT).show();
@@ -69,44 +71,40 @@ public class DictateAndSend extends Activity{
 		   	 }
 		   };
 		   	//registering our receiver
-		 this.registerReceiver(this.check,filtercheck);
-		
-		Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
-		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Please Dictate your Message").putExtra("type", "sms"));	
+		 this.registerReceiver(this.callcheck,filtercheck);
+		 this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Do you want to answer?").putExtra("type", "call"));	
+//		Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
+//		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Please Dictate your Message"));	
 	}
 	
     protected void onDestroy() {
-    	unregisterReceiver(check);
     	super.onDestroy();
-        
     }
 	
-	protected void sendSMSMessage(String phoneNo, String message) {
-	      Log.i("Send SMS", "");
-//
-//	      String phoneNo = txtphoneNo.getText().toString();
-//	      String message = txtMessage.getText().toString();
-	      Toast.makeText(getApplicationContext(),"Attempting to send message to: "+ phoneNo + " with details: "+message,
-	 	         Toast.LENGTH_SHORT).show();
-	      try {
-	         SmsManager smsManager = SmsManager.getDefault();
-	         smsManager.sendTextMessage(phoneNo, null, message, null, null);
-	         Toast.makeText(getApplicationContext(), "SMS sent.",
-	         Toast.LENGTH_SHORT).show();
-	      } catch (Exception e) {
-	         Toast.makeText(getApplicationContext(),
-	         "SMS failed, please try again.",
-	         Toast.LENGTH_SHORT).show();
-	         e.printStackTrace();
-	      }
-	   }
+	public static void acceptCall(Context context) 
+	{
+	    Intent buttonUp = new Intent(Intent.ACTION_MEDIA_BUTTON);
+	    buttonUp.putExtra(Intent.EXTRA_KEY_EVENT, 
+	      new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK));
+	    context.sendOrderedBroadcast(buttonUp, "android.permission.CALL_PRIVILEGED");
+	} 
+	/*
+	 * A function to reject an incoming call
+	 */
+	private void rejectCall(Context context) 
+	{
+	Intent buttonDown = new Intent(Intent.ACTION_MEDIA_BUTTON); buttonDown.putExtra(Intent.EXTRA_KEY_EVENT,
+	new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK));
+	context.sendOrderedBroadcast(buttonDown, "android.permission.CALL_PRIVILEGED");}
+	   
+    
 	private void startVoiceRecognitionActivity()	
     {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Please Dictate Your Message!");
-        //Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Reply Back?");
+        //Toast.makeText(getApplicationContext(), "You are supposed to talk now", Toast.LENGTH_SHORT).show();
         startActivityForResult(intent, REQUEST_CODE);
     }
  
@@ -121,10 +119,12 @@ public class DictateAndSend extends Activity{
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-           // Toast.makeText(getApplicationContext(), matches.get(0), Toast.LENGTH_SHORT).show();
-            	//Toast.makeText(getApplicationContext(),"Sending SMS to "+MyApp.number, Toast.LENGTH_SHORT).show();
-            	sendSMSMessage(MyApp.number,matches.get(0).toLowerCase());
-            	
+            Toast.makeText(getApplicationContext(), matches.get(0), Toast.LENGTH_SHORT).show();
+            if(matches.get(0).toLowerCase().compareTo("yes")==0){
+            	acceptCall(getApplicationContext());
+            }else{
+            	rejectCall(getApplicationContext());
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
         finish();
