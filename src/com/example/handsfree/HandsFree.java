@@ -257,7 +257,6 @@ public class HandsFree extends Activity {
         	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         	if(prefs.getBoolean("noti", true)){ 
             Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
-            String[] words=temp.split(".");
             
             if(MyApp.smsflag!=0){
             	MyApp.smsflag=0;
