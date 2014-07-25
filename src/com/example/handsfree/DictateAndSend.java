@@ -52,6 +52,7 @@ public class DictateAndSend extends Activity{
 	}
 	
 	
+	
 	private static final int REQUEST_CODE = 1234;
 	private BroadcastReceiver check;
 	IntentFilter filtercheck= new IntentFilter("android.intent.action.check");

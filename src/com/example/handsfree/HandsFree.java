@@ -76,7 +76,7 @@ public class HandsFree extends Activity {
 	}
 	
 	private BroadcastReceiver smsReceiver;
-	private NotificationReceiver nReceiver;
+	private BroadcastReceiver nReceiver;
 	private BroadcastReceiver smsReplier;
 	private static final int REQUEST_CODE =1234;
 	//private static String number;
@@ -87,16 +87,34 @@ public class HandsFree extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		createWakeLocks();
-		stopService(new Intent(this, NotiListener.class));
+		//stopService(new Intent(this, NotiListener.class));
 		stopService(new Intent(this, SmsListener.class));
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hands_free);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String smspref = prefs.getString("listPref", "1");
 		prefs.edit().putString("text", "Hey I will get back to you in a while");
-		//Toast.makeText(getApplicationContext(),"Call:"+String.valueOf(prefs.getBoolean("call", true))+"SMS:"+String.valueOf(prefs.getBoolean("sms", true))+"NOTI:"+String.valueOf(prefs.getBoolean("noti", true))+"CHECK:"+smspref, Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(),"Call:"+String.valueOf(prefs.getBoolean("call", true))+"SMS:"+String.valueOf(prefs.getBoolean("sms", true))+"NOTI:"+String.valueOf(prefs.getBoolean("noti", true))+"CHECK:"+smspref, Toast.LENGTH_SHORT).show();
 
-		nReceiver = new NotificationReceiver();
+		nReceiver = new BroadcastReceiver(){
+			public void onReceive(Context context, Intent intent) {
+	        	String temp = intent.getStringExtra("notification_event");
+	        	wakeDevice();
+	        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+	        	Toast.makeText(getApplicationContext(), "i got sometinhg", Toast.LENGTH_SHORT).show();
+	        	if(prefs.getBoolean("noti", true)){ 
+	            Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
+	            if(MyApp.smsflag!=0){
+	            	MyApp.smsflag=0;
+	            	}
+		        else{
+		            VoiceNoti(temp);
+		            }
+	            }
+	        	
+	        }
+		};
+		
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.example.handsfree.newnoti");
         registerReceiver(nReceiver,filter);
@@ -135,78 +153,75 @@ public class HandsFree extends Activity {
 		   };
 		   	//registering our receiver
 		 this.registerReceiver(this.smsReplier, intentFilter);
-		 
-			IntentFilter intentFilter3 = new IntentFilter("android.intent.action.PHONE_STATE");
-			
-			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); 
-					   
-	        
-	        /*
-	         * The Phone State Listener is an active listener for Phone Telephonic Changes
-	         */
-			
-		    
-		    
-			PhoneStateListener callStateListener = new PhoneStateListener() {
-	             public void onCallStateChanged(int state, String incomingNumber)
-	             {
-	                     /*
-	                      * When Phone Rings call the onClicking function 
-	                      * and pass on the incoming number  
-	                      */
-		    
-	                     if(state==TelephonyManager.CALL_STATE_RINGING)
-	                     {		 final String number = incomingNumber;
-	                             Toast.makeText(getApplicationContext(),incomingNumber, Toast.LENGTH_LONG).show();
-	                             //StartVoiceMessage function calls the voice service
-	                             //voice service broadcasts an intent and 
-	                             //main activity responds to it by starting to take input
-	                             
-	                 				try {
-	                 					new Handler().postDelayed(new Runnable() {
-	                 						@Override
-	                 						public void run() {
-	                 							//Intent i = new Intent(getApplicationContext(), voice.class);
-	                 							//i.putExtra(KhidkiOutGoingScreen.OUTGOING_SCREEN_FOR_SAMPLE_KEY, false);
-	                 							//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	                 							//i.putExtra("phone", number);
-	                 						}
-	                 					},2000);
-	                 			
-	                 			        		
-	                     	}
-	                     	catch (Exception e) {
-	                     		
-	                     	}
-	                             //StartVoiceMessage(number);
-	                     }
-	           
-	                       /*
-	                        * If OffHook
-	                        */
-	                     if(state==TelephonyManager.CALL_STATE_OFFHOOK)
-	                     {
-	                         Toast.makeText(getApplicationContext(),"Phone is Currently in A call", Toast.LENGTH_LONG).show();
-	                     }
-	                   
-	                    //*1#*111#
-	                    /*
-	                     * If Idle
-	                     */
-	                     if(state==TelephonyManager.CALL_STATE_IDLE)
-	                     {
-	                         Toast.makeText(getApplicationContext(),"phone is neither ringing nor in a call", Toast.LENGTH_LONG).show();
-	                     }
-	             }
-	             };
-
-	             /*
-	              * Activate Listner
-	              */
-	             
-	             telephonyManager.listen(callStateListener,PhoneStateListener.LISTEN_CALL_STATE);
-	             
-	             
+//			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); 
+//					   
+//	        
+//	        /*
+//	         * The Phone State Listener is an active listener for Phone Telephonic Changes
+//	         */
+//			
+//		    
+//		    
+//			PhoneStateListener callStateListener = new PhoneStateListener() {
+//	             public void onCallStateChanged(int state, String incomingNumber)
+//	             {
+//	                     /*
+//	                      * When Phone Rings call the onClicking function 
+//	                      * and pass on the incoming number  
+//	                      */
+//	            	 	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//	                     if(state==TelephonyManager.CALL_STATE_RINGING && prefs.getBoolean("call", true))
+//	                     {		 final String number = incomingNumber;
+//	                             Toast.makeText(getApplicationContext(),incomingNumber, Toast.LENGTH_LONG).show();
+//	                             //StartVoiceMessage function calls the voice service
+//	                             //voice service broadcasts an intent and 
+//	                             //main activity responds to it by starting to take input
+//	                             
+//	                 				try {
+//	                 					new Handler().postDelayed(new Runnable() {
+//	                 						@Override
+//	                 						public void run() {
+//	                 							
+//	                 						}
+//	                 					},4000);
+//	                 					Intent i = new Intent(getApplicationContext(), CallAnswer.class);
+//             							i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//             							i.putExtra("phone", number);
+//	                 					startActivity(i);	
+//	                 					//startActivity(new Intent(this,DictateAndSend.class).putExtra("number",MyApp.number));		
+//	                     	}
+//	                     	catch (Exception e) {
+//	                     		
+//	                     	}
+//	                             //StartVoiceMessage(number);
+//	                     }
+//	           
+//	                       /*
+//	                        * If OffHook
+//	                        */
+//	                     if(state==TelephonyManager.CALL_STATE_OFFHOOK)
+//	                     {
+//	                         Toast.makeText(getApplicationContext(),"Phone is Currently in A call", Toast.LENGTH_LONG).show();
+//	                     }
+//	                   
+//	                    //*1#*111#
+//	                    /*
+//	                     * If Idle
+//	                     */
+//	                     if(state==TelephonyManager.CALL_STATE_IDLE)
+//	                     {
+//	                         Toast.makeText(getApplicationContext(),"phone is neither ringing nor in a call", Toast.LENGTH_LONG).show();
+//	                     }
+//	             }
+//	             };
+//
+//	             /*
+//	              * Activate Listner
+//	              */
+//	             
+//	             telephonyManager.listen(callStateListener,PhoneStateListener.LISTEN_CALL_STATE);
+//	             
+//	             
 		 
 		 if(MyApp.flag==0){
 			 Intent intent=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
@@ -353,36 +368,18 @@ public class HandsFree extends Activity {
         ncomp.setSmallIcon(R.drawable.ic_launcher);
         ncomp.setAutoCancel(true);
         nManager.notify((int)System.currentTimeMillis(),ncomp.build());
+        Toast.makeText(getApplicationContext(), "Mock NOTI", Toast.LENGTH_SHORT).show();
 	}
 	
 	public void VoiceNoti(String value){
-		//Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
-		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "You Have a new Notification "+value));
+		Toast.makeText(getApplicationContext(), "Voice Noti", Toast.LENGTH_SHORT).show();
+		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "You Have a new Notification "+value).putExtra("type", "notif"));
 	}
 	
 	public void VoiceNotiAndSignal(String value){
-		//Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), "Voice Noti", Toast.LENGTH_SHORT).show();
 		this.startService(new Intent(this,ReadOutAndSignal.class).putExtra("noti", value));
 	}
 	
-    class NotificationReceiver extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-        	String temp = intent.getStringExtra("notification_event");
-        	wakeDevice();
-        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        	if(prefs.getBoolean("noti", true)){ 
-            Toast.makeText(getApplicationContext(), temp, Toast.LENGTH_SHORT).show();
-            
-            if(MyApp.smsflag!=0){
-            	MyApp.smsflag=0;
-            	}
-	        else{
-	            VoiceNoti(temp);
-	            }
-            }
-        	
-        }
-    }
+  
 }

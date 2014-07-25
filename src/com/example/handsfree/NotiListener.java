@@ -14,20 +14,24 @@ public class NotiListener extends NotificationListenerService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(getApplicationContext(), "Notification Services Started", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Notification Services Started poori service", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDestroy() {
+    	Toast.makeText(getApplicationContext(), "Dead", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 
-    @Override
+        
     public void onNotificationPosted(StatusBarNotification sbn) {
-        Log.i(TAG,"********** onNotificationPosted");
+    	Toast.makeText(getApplicationContext(), "Huhuh", Toast.LENGTH_SHORT).show();
+    	Log.i(TAG,"********** onNotificationPosted");
         Log.i(TAG,"ID :" + sbn.getId() + "\t" + sbn.getNotification().tickerText + "\t" + sbn.getPackageName());
         Intent i = new Intent("com.example.handsfree.newnoti");
-        i.putExtra("notification_event",(sbn.getPackageName().split("."))[(sbn.getPackageName().split(".")).length -1]+" "+sbn.getNotification().tickerText + "\n");
+        //(sbn.getPackageName().split("."))[(sbn.getPackageName().split(".")).length -1]+" "+
+        i.putExtra("notification_event",sbn.getNotification().tickerText + "\n");
+        
         sendBroadcast(i);
     }
 

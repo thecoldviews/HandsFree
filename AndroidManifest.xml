@@ -39,7 +39,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.CALLANSWER" />
             </intent-filter>
         </activity>
         <activity
@@ -48,7 +48,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICEREC" />
             </intent-filter>
         </activity>
                 <activity
@@ -57,7 +57,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.CONFIGURE" />
             </intent-filter>
         </activity>
             <service
@@ -81,6 +81,12 @@
 		  android:name="com.example.handsfree.ReadOut"
 		  android:icon="@drawable/ic_launcher"
 		  android:label="ReadOut"
+		 >
+	</service>
+	<service
+		  android:name="com.example.handsfree.CallReadout"
+		  android:icon="@drawable/ic_launcher"
+		  android:label="CallReadout"
 		 >
 	</service>
 	<service

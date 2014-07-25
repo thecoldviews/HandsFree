@@ -10,13 +10,14 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
-public class ReadOut extends Service implements TextToSpeech.OnInitListener{
+public class CallReadout extends Service implements TextToSpeech.OnInitListener{
 	
 	public final String tag="yo";
 	private String str;
+	
 	private TextToSpeech mTts;
 	private static final String TAG="TTSService";
-	public static int a=1;
+
 	
 	public void onCreate(){
 		Log.d(tag,"onCreate");
@@ -68,8 +69,8 @@ public class ReadOut extends Service implements TextToSpeech.OnInitListener{
 	                	e.printStackTrace();
 	                }
 	                Toast.makeText(getApplicationContext(), "Intent Sent", Toast.LENGTH_LONG).show();
-	                Intent i= new Intent("android.intent.action.check");
-	                Toast.makeText(getApplicationContext(), "SMS and NOTI Sent", Toast.LENGTH_LONG).show();
+	                Intent i= new Intent("android.intent.action.callcheck");
+	              	Toast.makeText(getApplicationContext(), "Call intent", Toast.LENGTH_LONG).show();
 	                this.sendBroadcast(i);
 	                this.stopSelf();
 	            }

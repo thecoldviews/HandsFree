@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import android.app.*;
 import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.*;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract.PhoneLookup;
 import android.speech.RecognizerIntent;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -57,6 +61,26 @@ public class CallAnswer extends Activity{
 	private BroadcastReceiver callcheck;
 	IntentFilter filtercheck= new IntentFilter("android.intent.action.callcheck");
 	
+	public static String getContactName(Context context,String phoneNumber) {
+		ContentResolver cr = context.getContentResolver();
+	    Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+	    Cursor cursor = cr.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+	    if (cursor == null) {
+	        return null;
+	    }
+	    String contactName = null;
+	    if(cursor.moveToFirst()) {
+	        contactName = cursor.getString(cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME));
+	    }
+
+	    if(cursor != null && !cursor.isClosed()) {
+	        cursor.close();
+	    }
+
+	    return contactName;
+	}
+	
+	
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.dictate);
@@ -72,12 +96,21 @@ public class CallAnswer extends Activity{
 		   };
 		   	//registering our receiver
 		 this.registerReceiver(this.callcheck,filtercheck);
-		 this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Do you want to answer?").putExtra("type", "call"));	
+		 String lol;
+		 String contact=getContactName(getApplicationContext(),getIntent().getStringExtra("phone"));
+ 		 if(contact==null){
+ 			lol = "Call From: " + getIntent().getStringExtra("phone");
+ 		}
+ 		else{
+ 			lol = "Call from "+ contact;
+ 		}
+		 this.startService(new Intent(this,CallReadout.class).putExtra("noti", lol + " Do you want to answer?").putExtra("type", "call"));	
 //		Toast.makeText(getApplicationContext(), "Starting Voice", Toast.LENGTH_SHORT).show();
 //		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "Please Dictate your Message"));	
 	}
 	
     protected void onDestroy() {
+    	unregisterReceiver(callcheck);
     	super.onDestroy();
     }
 	
