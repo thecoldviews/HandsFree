@@ -63,7 +63,7 @@ public class ReadOutAndSignal extends Service implements TextToSpeech.OnInitList
 	                sayHello(str);
 	                try{
 	                	//Toast.makeText(getApplicationContext(), "Delay dena hai 6 sec ka", Toast.LENGTH_LONG).show();
-	                	Thread.sleep(str.length()*180);
+	                	Thread.sleep(str.length()*90);
 	                }
 	                catch(InterruptedException e){
 	                	e.printStackTrace();
