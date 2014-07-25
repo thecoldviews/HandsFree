@@ -2,12 +2,8 @@ package com.example.handsfree;
 
 import java.util.ArrayList;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.app.Application;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.app.NotificationManager;
@@ -16,17 +12,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.NotificationCompat;
-import android.telephony.PhoneStateListener;
 import android.telephony.SmsManager;
-import android.telephony.SmsMessage;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
-import android.app.*;
 
 
 class MyApp extends Application {
@@ -83,11 +79,11 @@ public class HandsFree extends Activity {
 	
 	IntentFilter intentFilter= new IntentFilter("android.intent.action.MAIN");
 	IntentFilter intentFilter2 = new IntentFilter("android.intent.action.MAIN2");
-	
+    IntentFilter filter = new IntentFilter("com.example.HandsFree.newnoti");
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		createWakeLocks();
-		//stopService(new Intent(this, NotiListener.class));
+		stopService(new Intent(this, NotiListener.class));
 		stopService(new Intent(this, SmsListener.class));
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hands_free);
@@ -115,8 +111,6 @@ public class HandsFree extends Activity {
 	        }
 		};
 		
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.example.handsfree.newnoti");
         registerReceiver(nReceiver,filter);
         
 		 smsReceiver = new BroadcastReceiver() {
@@ -153,76 +147,7 @@ public class HandsFree extends Activity {
 		   };
 		   	//registering our receiver
 		 this.registerReceiver(this.smsReplier, intentFilter);
-//			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE); 
-//					   
-//	        
-//	        /*
-//	         * The Phone State Listener is an active listener for Phone Telephonic Changes
-//	         */
-//			
-//		    
-//		    
-//			PhoneStateListener callStateListener = new PhoneStateListener() {
-//	             public void onCallStateChanged(int state, String incomingNumber)
-//	             {
-//	                     /*
-//	                      * When Phone Rings call the onClicking function 
-//	                      * and pass on the incoming number  
-//	                      */
-//	            	 	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//	                     if(state==TelephonyManager.CALL_STATE_RINGING && prefs.getBoolean("call", true))
-//	                     {		 final String number = incomingNumber;
-//	                             Toast.makeText(getApplicationContext(),incomingNumber, Toast.LENGTH_LONG).show();
-//	                             //StartVoiceMessage function calls the voice service
-//	                             //voice service broadcasts an intent and 
-//	                             //main activity responds to it by starting to take input
-//	                             
-//	                 				try {
-//	                 					new Handler().postDelayed(new Runnable() {
-//	                 						@Override
-//	                 						public void run() {
-//	                 							
-//	                 						}
-//	                 					},4000);
-//	                 					Intent i = new Intent(getApplicationContext(), CallAnswer.class);
-//             							i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//             							i.putExtra("phone", number);
-//	                 					startActivity(i);	
-//	                 					//startActivity(new Intent(this,DictateAndSend.class).putExtra("number",MyApp.number));		
-//	                     	}
-//	                     	catch (Exception e) {
-//	                     		
-//	                     	}
-//	                             //StartVoiceMessage(number);
-//	                     }
-//	           
-//	                       /*
-//	                        * If OffHook
-//	                        */
-//	                     if(state==TelephonyManager.CALL_STATE_OFFHOOK)
-//	                     {
-//	                         Toast.makeText(getApplicationContext(),"Phone is Currently in A call", Toast.LENGTH_LONG).show();
-//	                     }
-//	                   
-//	                    //*1#*111#
-//	                    /*
-//	                     * If Idle
-//	                     */
-//	                     if(state==TelephonyManager.CALL_STATE_IDLE)
-//	                     {
-//	                         Toast.makeText(getApplicationContext(),"phone is neither ringing nor in a call", Toast.LENGTH_LONG).show();
-//	                     }
-//	             }
-//	             };
-//
-//	             /*
-//	              * Activate Listner
-//	              */
-//	             
-//	             telephonyManager.listen(callStateListener,PhoneStateListener.LISTEN_CALL_STATE);
-//	             
-//	             
-		 
+	 
 		 if(MyApp.flag==0){
 			 Intent intent=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
 		 	startActivity(intent);
@@ -373,7 +298,7 @@ public class HandsFree extends Activity {
 	
 	public void VoiceNoti(String value){
 		Toast.makeText(getApplicationContext(), "Voice Noti", Toast.LENGTH_SHORT).show();
-		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "You Have a new Notification "+value).putExtra("type", "notif"));
+		this.startService(new Intent(this,ReadOut.class).putExtra("noti", "You Have a new Notification "+value));
 	}
 	
 	public void VoiceNotiAndSignal(String value){

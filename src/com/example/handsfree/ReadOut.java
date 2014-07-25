@@ -2,10 +2,9 @@ package com.example.handsfree;
 
 import java.util.Locale;
 
-import android.app.*;
+import android.app.Service;
 import android.content.Intent;
-import android.os.*;
-import android.speech.RecognizerIntent;
+import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
