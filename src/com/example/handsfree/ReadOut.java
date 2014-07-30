@@ -2,9 +2,10 @@ package com.example.handsfree;
 
 import java.util.Locale;
 
-import android.app.Service;
+import android.app.*;
 import android.content.Intent;
-import android.os.IBinder;
+import android.os.*;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
@@ -61,14 +62,13 @@ public class ReadOut extends Service implements TextToSpeech.OnInitListener{
 	                sayHello(str);
 	                try{
 	                	//Toast.makeText(getApplicationContext(), "Delay dena hai 6 sec ka", Toast.LENGTH_LONG).show();
-	                	Thread.sleep(str.length()*180);
+	                	Thread.sleep(str.length()*160);
 	                }
 	                catch(InterruptedException e){
 	                	e.printStackTrace();
 	                }
 	                Toast.makeText(getApplicationContext(), "Intent Sent", Toast.LENGTH_LONG).show();
-	                Intent i= new Intent("android.intent.action.check");
-	                Toast.makeText(getApplicationContext(), "SMS and NOTI Sent", Toast.LENGTH_LONG).show();
+	                Intent i = new Intent("android.intent.action.check");
 	                this.sendBroadcast(i);
 	                this.stopSelf();
 	            }

@@ -10,14 +10,13 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
-public class ReadOutAndSignal extends Service implements TextToSpeech.OnInitListener{
+public class seperatereadout extends Service implements TextToSpeech.OnInitListener{
 	
 	public final String tag="yo";
 	private String str;
-
 	private TextToSpeech mTts;
 	private static final String TAG="TTSService";
-	
+	public static int a=1;
 	
 	public void onCreate(){
 		Log.d(tag,"onCreate");
@@ -32,7 +31,7 @@ public class ReadOutAndSignal extends Service implements TextToSpeech.OnInitList
                 );
 		//Toast.makeText(getApplicationContext(),"onStartCommand", Toast.LENGTH_LONG).show();
 	    mTts.setSpeechRate(1.0f);
-	    str=intent.getStringExtra("noti");
+	    str=intent.getStringExtra("oti");
 	    //Toast.makeText(getApplicationContext(),str, Toast.LENGTH_LONG).show();
 	    return Service.START_NOT_STICKY;
 	}
@@ -69,7 +68,7 @@ public class ReadOutAndSignal extends Service implements TextToSpeech.OnInitList
 	                	e.printStackTrace();
 	                }
 	                //Toast.makeText(getApplicationContext(), "Intent Sent", Toast.LENGTH_LONG).show();
-	                Intent i = new Intent("android.intent.action.MAIN").putExtra("voice", "Done");
+	                Intent i = new Intent("android.intent.action.MAI");
 	                this.sendBroadcast(i);
 	                this.stopSelf();
 	            }
