@@ -7,6 +7,7 @@ import android.app.Application;
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.app.NotificationManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -147,10 +148,18 @@ public class HandsFree extends Activity {
 		   };
 		   	//registering our receiver
 		 this.registerReceiver(this.smsReplier, intentFilter);
-	 
+		 
 		 if(MyApp.flag==0){
 			 Intent intent=new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
-		 	startActivity(intent);
+		 	try{
+		 		startActivity(intent);
+		 		Toast.makeText(getApplicationContext(), "Please tick the above option to use this app", Toast.LENGTH_SHORT).show();
+		 	}
+		 	catch(ActivityNotFoundException e){
+		 		 Toast.makeText(getApplicationContext(),
+		 		         "This application is not supported by your phone",
+		 		         Toast.LENGTH_LONG).show();
+		 	}
 		 	MyApp.flag=1;
 		 }
 		 
